@@ -23,7 +23,9 @@ class MainActivity : AppCompatActivity() {
         val todos: Call<List<Todo>> = service.getAllTodos()
         todos.enqueue(object : Callback<List<Todo>> {
             override fun onResponse(call: Call<List<Todo>>, response: Response<List<Todo>>) {
-                TODO("Not yet implemented")
+                if (response.isSuccessful){
+                    binding.todosText.text = response.body().toString()
+                }
             }
 
             override fun onFailure(call: Call<List<Todo>>, t: Throwable) {
