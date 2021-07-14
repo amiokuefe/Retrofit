@@ -19,14 +19,8 @@ class MainActivity : AppCompatActivity() {
         mytodoAdapter = TodoAdapter(listOf())
         binding.recycler.adapter = mytodoAdapter
 
+        val todos: Call<List<Todo>> = RetrofitProvider.service.getAllTodos()
 
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://jsonplaceholder.typicode.com/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val service: TodoService = retrofit.create(TodoService::class.java)
-        val todos: Call<List<Todo>> = service.getAllTodos()
         todos.enqueue(object : Callback<List<Todo>> {
             override fun onResponse(call: Call<List<Todo>>, response: Response<List<Todo>>) {
                 if (response.isSuccessful){
@@ -38,7 +32,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<List<Todo>>, t: Throwable) {
-                TODO("Not yet implemented")
             }
 
         })
