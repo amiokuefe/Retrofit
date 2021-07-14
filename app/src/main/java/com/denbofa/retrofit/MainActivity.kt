@@ -1,7 +1,9 @@
 package com.denbofa.retrofit
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.denbofa.retrofit.databinding.ActivityMainBinding
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
@@ -10,6 +12,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var mytodoAdapter: TodoAdapter
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,22 +22,14 @@ class MainActivity : AppCompatActivity() {
         mytodoAdapter = TodoAdapter(listOf())
         binding.recycler.adapter = mytodoAdapter
 
-        val todos: Call<List<Todo>> = RetrofitProvider.service.getAllTodos()
+        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
-        todos.enqueue(object : Callback<List<Todo>> {
-            override fun onResponse(call: Call<List<Todo>>, response: Response<List<Todo>>) {
-                if (response.isSuccessful){
-                    response.body()?.let {
-                        mytodoAdapter.lists = it
-                        mytodoAdapter.notifyDataSetChanged()
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<List<Todo>>, t: Throwable) {
-            }
-
-        })
-
+        viewModel.apply {
+            getAllTodos()
+            items.observe(this@MainActivity, {todo ->
+                mytodoAdapter.lists = todo
+                mytodoAdapter.notifyDataSetChanged()
+            })
+        }
     }
 }
